@@ -18,14 +18,15 @@ def get_consensus_prediction(features):
 @app.route('/predict', methods=['GET'])
 def predict():
     features = [float(request.args.get(f)) for f in ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']]
-    predictions = {name: get_model_prediction(model, features) for name, model in models.items()}
+    predictions = {name: int(get_model_prediction(model, features)) for name, model in models.items()}  # Cast to int
     return jsonify(predictions)
 
 @app.route('/consensus', methods=['GET'])
 def consensus():
     features = [float(request.args.get(f)) for f in ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']]
-    consensus_pred = get_consensus_prediction(features)
+    consensus_pred = int(get_consensus_prediction(features))  # Cast to int
     return jsonify({'consensus_prediction': consensus_pred})
+
 
 # slashinh mechanism
 import json
