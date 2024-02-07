@@ -6,15 +6,20 @@ const port = 3002;
 app.use(express.json());
 app.use(express.static('public'));
 
-
-// Helper function to read the database
+// Function to read the primary database
 function readDB() {
     return JSON.parse(fs.readFileSync('db.json', 'utf8'));
 }
 
-// Helper function to write to the database
+// Function to read the mirrored database
+function readDBMirror() {
+    return JSON.parse(fs.readFileSync('db_mirror.json', 'utf8'));
+}
+
+// Function to write to both the primary and mirrored databases
 function writeDB(data) {
     fs.writeFileSync('db.json', JSON.stringify(data, null, 2), 'utf8');
+    fs.writeFileSync('db_mirror.json', JSON.stringify(data, null, 2), 'utf8');
 }
 
 // Products Routes
@@ -84,7 +89,6 @@ app.post('/cart/:userId', (req, res) => {
     }
     db.carts[userId].push({ productId, quantity });
     writeDB(db);
-
     res.json({ message: 'Product added to cart', cart: db.carts[userId] });
 });
 
@@ -107,10 +111,7 @@ app.delete('/cart/:userId/item/:productId', (req, res) => {
     res.send(`Product with id ${req.params.productId} removed from cart`);
 });
 
-
-
-
 // Start the server
 app.listen(port, () => {
-    console.log(`E-commerce API server listening at http://localhost:${port}`);
+    console.log(`E-commerce API server with synchronous mirroring listening at http://localhost:${port}`);
 });

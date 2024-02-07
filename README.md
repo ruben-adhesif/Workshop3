@@ -1,30 +1,27 @@
-# E-commerce Redundancy Test
+# E-commerce Platform with Synchronous Mirroring
 
-This README outlines the steps to simulate a server failure and test the redundancy setup for the e-commerce application.
+## Overview
+This section of the practical work enhances the reliability and data integrity of our e-commerce platform by implementing synchronous mirroring. This approach ensures real-time data availability across two storage systems, providing robust protection against data loss and enabling high availability.
 
-## Setup
+## Implementation Details
 
-Ensure that you have three servers running:
-- E-commerce app running on `localhost:3002`
-- DNS server running on `localhost:4000`
-- Hello World server running on `localhost:3001`
+### Synchronous Mirroring
+We've modified the server implementation to write data simultaneously to two databases (`db.json` and `db_mirror.json`). This ensures every transaction made to the primary database is concurrently mirrored to the secondary database, maintaining a consistent state across both.
 
-## Testing Steps
+### Server Modification
+The `server.js` file was adapted to include functions for reading from and writing to both the primary and mirrored databases. This guarantees data synchronization across both storage systems at all times, providing a fallback in case the primary database becomes inaccessible.
 
-1. **Start the Servers**: Ensure all three servers are running.
+### Frontend Interactions
+The frontend (`index.html`) allows users to interact with the e-commerce platform, enabling them to add products, create orders, and manage their shopping cart. The frontend communicates with the backend through API endpoints defined in `server.js`.
 
-2. **Check E-commerce Server**: Visit `http://localhost:3002` and verify that the e-commerce application is running.
+### Data Structure
+The data is structured into products, orders, and carts, stored in `db.json` and `db_mirror.json`. Synchronous mirroring ensures that both databases are always up-to-date with the latest changes.
 
-3. **Check DNS Server Response**: Visit `http://localhost:4000/getServer` and verify that it returns the e-commerce server address (`localhost:3002`).
+## Testing Synchronous Mirroring
 
-4. **Simulate E-commerce Server Failure**: Manually stop the e-commerce app server to simulate its failure.
+- Start the e-commerce server by running `node server.js` in the terminal. This initiates the server on port 3002 and serves the frontend via `http://localhost:3002`.
+- Interact with the e-commerce platform through the provided frontend interface. Add products, create orders, and add items to the cart.
+- Verify that changes are reflected in both `db.json` and `db_mirror.json` to confirm synchronous mirroring is functioning correctly.
 
-5. **Toggle DNS Response**: Simulate the DNS server detecting the failure by visiting `http://localhost:4000/toggleEcommerceServer`. This toggles the internal flag to represent the e-commerce server being down.
-
-6. **Check DNS Server Redirect**: Visit `http://localhost:4000/getServer` again. It should now return the "Hello World" server address (`localhost:3001`).
-
-7. **Verify Redirect**: Finally, visit `http://localhost:3001` to confirm that the "Hello World" server is running and can serve requests in place of the e-commerce app.
-
-## Notes
-
-In a real-world scenario, the DNS server would automatically detect the health of the e-commerce server and switch over to the backup server. This manual toggle is only for simulation purposes.
+## Conclusion
+Implementing synchronous mirroring in our e-commerce platform significantly enhances data reliability and system availability. By maintaining a real-time mirror of our database, we ensure our platform can withstand unforeseen data disruptions, providing a seamless experience for our users.
