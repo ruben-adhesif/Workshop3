@@ -5,6 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 import numpy as np
 import pickle
+import os
 
 # Load the dataset
 iris = load_iris()
@@ -19,6 +20,11 @@ models = {
     'logistic_regression': LogisticRegression(max_iter=200),
     'svm': SVC(probability=True)
 }
+
+# Creat folder models
+directory_name = "models"
+if not os.path.exists(directory_name):
+    os.mkdir(directory_name)
 
 # Train models and save them
 for name, model in models.items():
