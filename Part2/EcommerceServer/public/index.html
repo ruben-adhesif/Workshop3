@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>E-commerce Frontend</title>
+    <style>
+        .product {
+            margin-bottom: 10px;
+        }
+        .product button {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Add Product</h2>
+<form id="addProductForm">
+    Name: <input type="text" id="productName"><br>
+    Price: <input type="number" id="productPrice"><br>
+    Category: <input type="text" id="productCategory"><br>
+    Stock: <input type="number" id="productStock"><br>
+    <button type="submit">Add Product</button>
+</form>
+
+<h2>Create Order</h2>
+<form id="createOrderForm">
+    User ID: <input type="number" id="userId"><br>
+    Product IDs and Quantities (comma-separated): <input type="text" id="productQuantities"><br>
+    <button type="submit">Create Order</button>
+</form>
+<h2>Add to Cart</h2>
+<form id="addToCartForm">
+    User ID: <input type="number" id="cartUserId"><br>
+    Product ID: <input type="number" id="cartProductId"><br>
+    Quantity: <input type="number" id="cartQuantity"><br>
+    <button type="submit">Add to Cart</button>
+</form>
+
+<h2>Products</h2>
+<div id="productList"></div>
+
+<script>
+    document.getElementById('addProductForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const name = document.getElementById('productName').value;
+        const price = parseFloat(document.getElementById('productPrice').value);
+        const category = document.getElementById('productCategory').value;
+        const stock = parseInt(document.getElementById('productStock').value);
+
+        fetch('http://localhost:3002/products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name, price, category, stock }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                loadProducts(); // Reload products after adding
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
+
+    function loadProducts() {
+        fetch('http://localhost:3002/products')
+            .then(response => response.json())
+            .then(data => {
+                const productList = document.getElementById('productList');
+                productList.innerHTML = ''; // Clear current products
+                data.forEach(product => {
+                    const productElement = document.createElement('div');
+                    productElement.classList.add('product');
+                    productElement.textContent = `Name: ${product.name}, Price: ${product.price}, Category: ${product.category}, Stock: ${product.stock}`;
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.onclick = function() { deleteProduct(product.id); };
+                    productElement.appendChild(deleteButton);
+                    productList.appendChild(productElement);
+                });
+            });
+    }
+
+    function deleteProduct(id) {
+        fetch(`http://localhost:3002/products/${id}`, { method: 'DELETE' })
+            .then(() => {
+                console.log('Product deleted successfully');
+                loadProducts(); // Reload products after deletion
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    // Initial load of products
+    loadProducts();
+
+    // Script for creating an order
+    document.getElementById('createOrderForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const userId = document.getElementById('userId').value;
+        const pq = document.getElementById('productQuantities').value;
+        const products = pq.split(',').map(pq => {
+            const [id, quantity] = pq.split(':').map(Number);
+            return { productId: id, quantity };
+        });
+
+        fetch('http://localhost:3002/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, products }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Order created:', data);
+                // Add any additional logic for after order creation
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
+
+
+
+    // Script for adding to cart
+    document.getElementById('addToCartForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const userId = document.getElementById('cartUserId').value;
+        const productId = document.getElementById('cartProductId').value;
+        const quantity = document.getElementById('cartQuantity').value;
+
+        fetch(`http://localhost:3002/cart/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId, quantity }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Item added to cart:', data);
+                // Add any additional logic for after adding to cart
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
+
+</script>
+</body>
+</html>
