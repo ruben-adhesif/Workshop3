@@ -23,5 +23,5 @@ models = {
 # Train models and save them
 for name, model in models.items():
     model.fit(X_train, y_train)
-    with open(f'{name}_model.pkl', 'wb') as file:
+    with open(f'models/{name}_model.pkl', 'wb') as file:
         pickle.dump(model, file)
