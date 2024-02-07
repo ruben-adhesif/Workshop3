@@ -16,10 +16,19 @@ function readDBMirror() {
     return JSON.parse(fs.readFileSync('db_mirror.json', 'utf8'));
 }
 
+// Asynchronous write to the secondary database
+function asyncWriteDB(data) {
+    setTimeout(() => {
+        fs.writeFileSync('db_async.json', JSON.stringify(data, null, 2), 'utf8');
+    }, 5000); // Simulate delay of 5 seconds for asynchronous replication
+}
+
 // Function to write to both the primary and mirrored databases
 function writeDB(data) {
     fs.writeFileSync('db.json', JSON.stringify(data, null, 2), 'utf8');
     fs.writeFileSync('db_mirror.json', JSON.stringify(data, null, 2), 'utf8');
+    asyncWriteDB(data); // Asynchronously replicate to the secondary database
+
 }
 
 // Products Routes

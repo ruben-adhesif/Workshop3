@@ -13,6 +13,13 @@
       "price": 5,
       "category": "food",
       "stock": 50
+    },
+    {
+      "id": 3,
+      "name": "potato",
+      "price": 4,
+      "category": "food",
+      "stock": 75
     }
   ],
   "orders": [

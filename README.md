@@ -1,27 +1,35 @@
-# E-commerce Platform with Synchronous Mirroring
+# Asynchronous Replication for E-Commerce Platform
+
+This part of the project demonstrates the implementation of asynchronous replication in an e-commerce platform. Asynchronous replication is a method where data is replicated to a secondary storage system with some delay, providing redundancy and enhancing disaster recovery capabilities.
 
 ## Overview
-This section of the practical work enhances the reliability and data integrity of our e-commerce platform by implementing synchronous mirroring. This approach ensures real-time data availability across two storage systems, providing robust protection against data loss and enabling high availability.
+
+In this implementation, changes made to the primary database are queued and then asynchronously replicated to a secondary database after a simulated delay. This setup mimics a real-world scenario where data replication occurs over a Wide Area Network (WAN) to a geographically remote site for disaster recovery purposes.
 
 ## Implementation Details
 
-### Synchronous Mirroring
-We've modified the server implementation to write data simultaneously to two databases (`db.json` and `db_mirror.json`). This ensures every transaction made to the primary database is concurrently mirrored to the secondary database, maintaining a consistent state across both.
+- **Primary Database (`db.json`):** The main database where all transactions and data modifications are first recorded.
+- **Secondary Database (`db_async.json`):** The replica database where data from the primary database is replicated asynchronously.
+- **Asynchronous Replication Logic:** Implemented in the `server.js` within the `Asynchronous-Replication` folder, this logic introduces a delay when replicating data to the secondary database, simulating the asynchronous nature of the replication process.
 
-### Server Modification
-The `server.js` file was adapted to include functions for reading from and writing to both the primary and mirrored databases. This guarantees data synchronization across both storage systems at all times, providing a fallback in case the primary database becomes inaccessible.
+## Key Functions
 
-### Frontend Interactions
-The frontend (`index.html`) allows users to interact with the e-commerce platform, enabling them to add products, create orders, and manage their shopping cart. The frontend communicates with the backend through API endpoints defined in `server.js`.
+- `readDB()`: Reads data from the primary database.
+- `writeDB(data)`: Writes data to the primary database and initiates asynchronous replication to the secondary database.
+- `asyncWriteDB(data)`: Simulates a delayed write operation to the secondary database, mimicking the behavior of data replication over a WAN.
 
-### Data Structure
-The data is structured into products, orders, and carts, stored in `db.json` and `db_mirror.json`. Synchronous mirroring ensures that both databases are always up-to-date with the latest changes.
+## Testing the Implementation
 
-## Testing Synchronous Mirroring
+To test asynchronous replication:
+1. Perform various operations (create, update, delete) on the e-commerce platform.
+2. Observe the immediate changes in the primary database (`db.json`).
+3. After the simulated delay, verify that the changes are replicated to the secondary database (`db_async.json`).
 
-- Start the e-commerce server by running `node server.js` in the terminal. This initiates the server on port 3002 and serves the frontend via `http://localhost:3002`.
-- Interact with the e-commerce platform through the provided frontend interface. Add products, create orders, and add items to the cart.
-- Verify that changes are reflected in both `db.json` and `db_mirror.json` to confirm synchronous mirroring is functioning correctly.
+## Error Handling
+
+The implementation includes basic error handling for write operations. In a real-world scenario, more robust error handling, including retry mechanisms and alerts, would be necessary to ensure data consistency and integrity across the primary and secondary databases.
 
 ## Conclusion
-Implementing synchronous mirroring in our e-commerce platform significantly enhances data reliability and system availability. By maintaining a real-time mirror of our database, we ensure our platform can withstand unforeseen data disruptions, providing a seamless experience for our users.
+
+This asynchronous replication setup provides a foundational understanding of how data redundancy and disaster recovery mechanisms can be implemented. It highlights the importance of asynchronous replication in ensuring data availability and integrity, especially in geographically dispersed systems.
+
