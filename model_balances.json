@@ -1,5 +1,5 @@
 {
     "random_forest": 1010,
     "logistic_regression": 1000,
-    "svm": 1010
+    "svm": 1020
 }
